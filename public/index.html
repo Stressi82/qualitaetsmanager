@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#cfe8cc">
+  <meta name="description" content="Qualitätsmanager Lernplattform mit 843 eindeutigen Fragen aus sieben Excel-Quellen, interaktiver Betriebsbegehung, Lernpfad, Dokumententraining, Karteikarten und QM-Werkzeugen.">
+  <meta name="application-name" content="Qualitätsmanager Lernplattform">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Qualitätsmanager Lernplattform">
+  <meta name="format-detection" content="telephone=no">
+  <title>Qualitätsmanager Lernplattform v11.0.42</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css?v=11.0.42-quality-manager">
+  <link rel="stylesheet" href="./account.css?v=11.0.42-quality-manager">
+</head>
+<body>
+  <noscript>Diese App benötigt JavaScript. Bitte JavaScript im Browser aktivieren.</noscript>
+  <div id="app" aria-live="polite">
+    <div class="boot-screen">
+      <div class="boot-logo">Q</div>
+      <strong>Qualitätsmanager Lernplattform wird gestartet …</strong>
+      <span>Lernplattform wird geladen</span>
+    </div>
+  </div>
+  <script src="./account-client.js?v=11.0.42-quality-manager"></script>
+  <script src="./data.js?v=11.0.42-quality-manager"></script>
+  <script src="./app.js?v=11.0.42-quality-manager"></script>
+  <script>
+    window.setTimeout(function () {
+      var app = document.getElementById('app');
+      if (app && app.querySelector('.boot-screen')) {
+        app.innerHTML = '<main class="startup-error"><h1>Die App konnte nicht gestartet werden.</h1><p>Bitte die Seite neu laden. Falls der Fehler bleibt, den Browser-Cache löschen und die Seite erneut öffnen.</p><button onclick="location.reload()">Neu laden</button></main>';
+      }
+    }, 8000);
+  </script>
+</body>
+</html>
