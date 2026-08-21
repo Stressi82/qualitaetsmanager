@@ -45,7 +45,7 @@ async function signup(request, env) {
   const existing = await env.DB.prepare('SELECT * FROM users WHERE email = ?').bind(email).first();
   const legacy = await env.DB.prepare('SELECT * FROM legacy_accounts WHERE email = ?').bind(email).first();
   if (existing) {
-    if (!legacy || !constantTimeEqual(await hashPassword(password, existing.password_salt), existing.password_hash)) {
+    if (!legacy || !constantTimeEqual(await hashPassword(password, existing.password_salt, env.JWT_SECRET), existing.password_hash)) {
       return json({ error: 'A user with this email address has already been registered' }, 422);
     }
     const claimed = await claimLegacyAccount(existing, legacy, env);
@@ -58,7 +58,7 @@ async function signup(request, env) {
   const id = crypto.randomUUID();
   const clientId = legacy?.user_id || id;
   const salt = randomBase64(16);
-  const passwordHash = await hashPassword(password, salt);
+  const passwordHash = await hashPassword(password, salt, env.JWT_SECRET);
   const now = new Date().toISOString();
   const roles = JSON.stringify(['member']);
   const statements = [
@@ -88,7 +88,7 @@ async function token(request, env) {
   if (grant === 'password') {
     const email = normalizeEmail(form.get('username'));
     user = await env.DB.prepare('SELECT * FROM users WHERE email = ?').bind(email).first();
-    if (!user || !constantTimeEqual(await hashPassword(form.get('password') || '', user.password_salt), user.password_hash)) {
+    if (!user || !constantTimeEqual(await hashPassword(form.get('password') || '', user.password_salt, env.JWT_SECRET), user.password_hash)) {
       return json({ msg: 'Anmeldung nicht möglich. Falls du dein Konto vor dem Umzug angelegt hast, wähle bitte einmal „Neues Konto erstellen“.' }, 401);
     }
     const legacy = await env.DB.prepare('SELECT * FROM legacy_accounts WHERE email = ?').bind(user.email).first();
@@ -118,7 +118,7 @@ async function updateUser(request, env) {
   if (body.password) {
     if (String(body.password).length < 10) return json({ error: 'Passwort ist zu kurz.' }, 400);
     const salt = randomBase64(16);
-    const hash = await hashPassword(String(body.password), salt);
+    const hash = await hashPassword(String(body.password), salt, env.JWT_SECRET);
     await env.DB.prepare('UPDATE users SET password_hash=?,password_salt=?,updated_at=? WHERE id=?')
       .bind(hash, salt, new Date().toISOString(), user.id).run();
   }
@@ -231,10 +231,17 @@ async function verifyJwt(token, secret) {
   } catch { return null; }
 }
 
-async function hashPassword(password, salt) {
-  const material = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: fromBase64(salt), iterations: 310000, hash: 'SHA-256' }, material, 256);
-  return base64(new Uint8Array(bits));
+async function hashPassword(password, salt, pepper) {
+  if (!pepper) throw new Error('JWT_SECRET fehlt');
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(pepper),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const input = encoder.encode(`qmb-password-v2\0${salt}\0${password}`);
+  return base64(new Uint8Array(await crypto.subtle.sign('HMAC', key, input)));
 }
 
 async function sha256(value) {
