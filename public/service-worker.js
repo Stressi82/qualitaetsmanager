@@ -1,14 +1,14 @@
-const CACHE = 'qmb-netlify-v11-0-42-quality-manager';
+const CACHE = 'qmb-cloudflare-v11-0-43-account-recovery';
 const APP_SHELL = [
   './',
   './index.html',
-  './styles.css?v=11.0.42-quality-manager',
-  './account.css?v=11.0.42-quality-manager',
-  './legal.css?v=11.0.42-quality-manager',
+  './styles.css?v=11.0.43-cloudflare-recovery',
+  './account.css?v=11.0.43-cloudflare-recovery',
+  './legal.css?v=11.0.43-cloudflare-recovery',
   './rechtliches.html',
-  './account-client.js?v=11.0.42-quality-manager',
-  './data.js?v=11.0.42-quality-manager',
-  './app.js?v=11.0.42-quality-manager',
+  './account-client.js?v=11.0.43-cloudflare-recovery',
+  './data.js?v=11.0.43-cloudflare-recovery',
+  './app.js?v=11.0.43-cloudflare-recovery',
   './lernmodule.html',
   './manifest.webmanifest',
   './icons/icon-192.png',
